@@ -61,9 +61,9 @@ function initialInfo(ip, apikey, index){
   $.getJSON("http://"+ip+"/api/printerprofiles", function(json){document.getElementById("printerName"+index).innerHTML=json.profiles._default.name;});
   // set the panel footer as the printer's ip
   if(ip.indexOf(":80")===-1){
-    document.getElementById("printerIP"+index).innerHTML = ip;
-  }else {
-    document.getElementById("printerIP"+index).innerHTML = ip.replace(":80", "");
+    document.getElementById("printerIP"+index).innerHTML ="<a href=" + 'http://'+ ip + '/ ' + 'target="_blank"' + '>'+ip+"</a>";
+  } else {
+    document.getElementById("printerIP"+index).innerHTML ="<a href=" + 'http://'+ ip.replace(":80", "") + '/ ' + 'target="_blank"' + '>'+ip.replace(":80", "")+"</a>";
   }
 
   updateStatus(ip, apikey, index);
