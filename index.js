@@ -58,7 +58,15 @@ function initialInfo(ip, apikey, index){
   // add apikey header to GET request
   $.ajaxSetup({headers:{"X-Api-Key" : apikey}});
   // get name of the printer
-  $.getJSON("http://"+ip+"/api/printerprofiles", function(json){document.getElementById("printerName"+index).innerHTML=json.profiles._default.name;});
+  $.getJSON("http://"+ip+"/api/printerprofiles", function(json){
+    var printerName = null;
+    $.each(json.profiles, function(i, v) {
+      if (v.current == true) {
+        printerName = v.name;
+      }
+    });
+    document.getElementById("printerName"+index).innerHTML=printerName;
+  });
   // set the panel footer as the printer's ip
   if(ip.indexOf(":80")===-1){
     document.getElementById("printerIP"+index).innerHTML ="<a href=" + 'http://'+ ip + '/ ' + 'target="_blank"' + '>'+ip+"</a>";
