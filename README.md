@@ -19,5 +19,5 @@ PrinterView uses the following:
 * [Bootstrap Toggle](http://www.bootstraptoggle.com/)
 
 # Screenshots
-![Welcome screen](https://raw.githubusercontent.com/quillford/PrinterView/master/images/screenshots/screenshot-welcome.png)
-![screenshot](https://raw.githubusercontent.com/quillford/PrinterView/master/images/screenshots/screenshot.png)
+![Welcome screen](https://raw.githubusercontent.com/moorviper/PrinterView/master/images/screenshots/screenshot-welcome.png)
+![screenshot](https://raw.githubusercontent.com/moorviper/PrinterView/master/images/screenshots/screenshot.png)
