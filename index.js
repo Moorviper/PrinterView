@@ -17,6 +17,28 @@ window.onload = function(){
   setInterval(function () {updatePrinters();}, refreshRate);
 };
 
+function seconds2time(seconds) {
+    var hours   = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds - (hours * 3600)) / 60);
+    var seconds = seconds - (hours * 3600) - (minutes * 60);
+    var time = "";
+
+    if (hours != 0) {
+      time = hours+":";
+    }
+    if (minutes != 0 || time !== "") {
+      minutes = (minutes < 10 && time !== "") ? "0"+minutes : String(minutes);
+      time += minutes+":";
+    }
+    if (time === "") {
+      time = seconds+"s";
+    }
+    else {
+      time += (seconds < 10) ? "0"+seconds : String(seconds);
+    }
+    return time;
+}
+
 function reloadPrinters(){
   if(localStorage.getItem("savedPrinters") === null){
       printers ={
@@ -81,7 +103,7 @@ function updateStatus(ip, apikey, index){
           // set filename of current print
           document.getElementById("currentFile"+index).innerHTML="File: "+json.job.file.name.split(".").slice(0, -1).join(".");
           // set estimation of print time left
-          document.getElementById("timeLeft"+index).innerHTML="Time left: "+(json.progress.printTimeLeft/60).toFixed(2) + " minutes";
+          document.getElementById("timeLeft"+index).innerHTML="Time left: "+ seconds2time(json.progress.printTimeLeft) + "";
           // set percentage of print completion
           $("div#progressBar"+index).css("width", json.progress.completion + "%");
       }
