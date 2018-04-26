@@ -43,13 +43,14 @@ function reloadPrinters(){
   if(localStorage.getItem("savedPrinters") === null){
       printers ={
           "ip":[],
-          "apikey":[]
+          "apikey":[],
+          "camPort":[]
       };
       $("#noPrintersModal").modal("show");
   }else {
       printers = JSON.parse(localStorage.getItem("savedPrinters"));
       for(var i=0;i<printers.ip.length;i++){
-          addPrinter(printers.ip[i], printers.apikey[i]);
+          addPrinter(printers.ip[i], printers.apikey[i], printers.camPort[i]);
       }
   }
 }
@@ -100,13 +101,17 @@ function updateStatus(ip, apikey, index){
       // get printer state
       document.getElementById("printerStatus"+index).innerHTML="State: "+json.state;
       //get filename of print
-      if(json.job.file.name === null){
+      if(json.job.file.name === null || json.state == "Operational"){
           // set current file to no file selected
           document.getElementById("currentFile"+index).innerHTML="No file selected";
           // set time left field to no active print
           document.getElementById("timeLeft"+index).innerHTML="No active print";
           // set print progress bar perecent to 0
           $("div#progressBar"+index ).css("width", "0%");
+          // document.getElementById("progressBar"+index).innerHTML="No active print";
+          $("div#printerIP"+index).css("background-color", "#05750a");
+      }else if (json.state == "Paused") {
+        $("div#printerIP"+index).css("background-color", "#ffe404");
       }else {
           // set filename of current print
           document.getElementById("currentFile"+index).innerHTML="File: "+json.job.file.name.split(".").slice(0, -1).join(".");
@@ -114,6 +119,8 @@ function updateStatus(ip, apikey, index){
           document.getElementById("timeLeft"+index).innerHTML="Time left: "+ seconds2time(json.progress.printTimeLeft) + "";
           // set percentage of print completion
           $("div#progressBar"+index).css("width", json.progress.completion + "%");
+          // $("div#progressBar"+index).html(json.progress.completion).to;
+          $("div#printerIP"+index).css("background-color", "#f00");
       }
   })
   .error(function() {
@@ -146,7 +153,7 @@ function updatePrinters(){
   }
 }
 
-function addPrinter(ip, apikey){
+function addPrinter(ip, apikey, camPort){
   var printerNum = numPrinters;
   var removeButton = '<li><button type="button" class="btn btn-default btn-sm pull-right" data-toggle="modal" onclick="removePrinter('+printerNum+')">Remove Printer <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button></li>';
   var octoPrintPageButton = '<li><a type="button" class="btn btn-default btn-sm pull-right" data-toggle="modal" href="http://'+ip+'/" target="_blank">OctoPrint <span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>';
@@ -165,6 +172,10 @@ function addPrinter(ip, apikey){
 
   $("#panel"+printerNum).append('<div class="panel-body" id="body'+printerNum+'"></div>');
 
+  webcam = "http://" +ip+"/";
+  webcamstream = webcam.split('/')[2].split(':')[0];
+  $("#body"+printerNum).append('<image src="http://'+webcamstream+':'+ camPort +'/?action=stream" style="border:none;" width="100%" height="100%"></image>');
+
   $("#body"+printerNum).append('<p id="printerStatus'+printerNum+'">status</p>');
   $("#body"+printerNum).append('<p id="e0Temp'+printerNum+'">0</p>');
   $("#body"+printerNum).append('<p id="bedTemp'+printerNum+'">0</p>');
@@ -179,6 +190,7 @@ function addPrinter(ip, apikey){
   // store ip and apikey info
   printers.ip[printerNum]=ip;
   printers.apikey[printerNum]=apikey;
+  printers.camPort[printerNum]=camPort;
 
   // save new printer to local storage
   localStorage.setItem("savedPrinters", JSON.stringify(printers));
@@ -193,15 +205,17 @@ function addFromModal(){
   var newIP = $("#newIP").val();
   var newPort = $("#newPort").val();
   var newApikey = $("#newApikey").val();
+  var camPort = $("#newCamPort").val();
 
   if(newIP === ""|| newApikey === "" || newPort == ""){
     $("#missingInfoModal").modal("show");
   }else {
     var ipAddress = newIP + ":" + newPort;
-    testConnection(ipAddress, newApikey);
+    testConnection(ipAddress, newApikey, camPort);
     $("#newIP").val("");
     $("#newPort").val("80");
     $("#newApikey").val("");
+    $("#newCamPort").val("");
   }
 }
 
@@ -264,23 +278,23 @@ function connectionError(ip, apikey){
 
 	bootbox.confirm(errorMessage, function(result){
 		if(result){
-			addPrinter(ip, apikey);
+			addPrinter(ip, apikey, camPort);
 		}else {
 			return 0;
 		}
 	});
 }
 
-function testConnection(ip, apikey){
+function testConnection(ip, apikey, camPort){
   	$.ajaxSetup({headers:{"X-Api-Key" : apikey}});
   	$.getJSON("http://"+ip+"/api/version", function(json){
   		if(json.api !== null){
-        addPrinter(ip, apikey);
+        addPrinter(ip, apikey, camPort);
   		}else {
-        connectionError(ip, apikey);
+        connectionError(ip, apikey, camPort);
   		}
   	})
   	.error(function(){
-      connectionError(ip, apikey);
+      connectionError(ip, apikey, camPort);
   	});
 }
