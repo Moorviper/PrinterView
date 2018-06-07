@@ -224,9 +224,10 @@ function deletePrinters(){
 	localStorage.removeItem("savedPrinters");
 	// remove the printers from the printers object
   printers ={
-        "ip":[],
-    	"apikey":[]
-	};
+    "ip":[],
+    "apikey":[],
+    "camPort":[]
+};
 	// reset the number of printers
 	numPrinters = 0;
 	// remove all elements within the grid
@@ -241,8 +242,9 @@ function removePrinter(index){
 			document.getElementById("printer"+index).remove();
 
 			// remove the printer from the printers object
-			printers.ip.splice(index, 1);
-			printers.apikey.splice(index, 1);
+      printers.ip.splice(index, 1);
+      printers.apikey.splice(index, 1);
+      printers.camPort.splice(index, 1);
 
 			// save new object to localStorage
 			if(numPrinters <= 1){
